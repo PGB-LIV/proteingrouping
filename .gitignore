@@ -1,0 +1,35 @@
+target/
+*.csv
+*.txt
+*.mzq
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/proteininference/ProteinInference.java
+com.mycompany_ProteinInference_working 21.02.17/nbactions.xml
+com.mycompany_ProteinInference_working 21.02.17/pom.xml
+com.mycompany_ProteinInference_working 21.02.17/src/main/java/Grouping/Group.java
+com.mycompany_ProteinInference_working 21.02.17/src/main/java/Grouping/GroupArray.java
+com.mycompany_ProteinInference_working 21.02.17/src/main/java/Peptide/PepArray.java
+com.mycompany_ProteinInference_working 21.02.17/src/main/java/Peptide/Peptide.java
+com.mycompany_ProteinInference_working 21.02.17/src/main/java/Protein/ProtArray.java
+com.mycompany_ProteinInference_working 21.02.17/src/main/java/Protein/Protein.java
+com.mycompany_ProteinInference_working 21.02.17/src/main/java/proteininference/ProteinInference.java
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/Grouping/GroupArray.java
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/Peptide/PepArray.java
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/Peptide/Peptide.java
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/Protein/ProtArray.java
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/Protein/Protein.java
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/proteininference/Load.java
+ProteinInference_working_20.02.17/nbactions.xml
+ProteinInference_working_20.02.17/pom.xml
+ProteinInference_working_20.02.17/src/main/java/Grouping/Group.java
+ProteinInference_working_20.02.17/src/main/java/Grouping/GroupArray.java
+ProteinInference_working_20.02.17/src/main/java/Peptide/PepArray.java
+ProteinInference_working_20.02.17/src/main/java/Peptide/PepHash.java
+ProteinInference_working_20.02.17/src/main/java/Peptide/Peptide.java
+ProteinInference_working_20.02.17/src/main/java/Protein/ProtArray.java
+ProteinInference_working_20.02.17/src/main/java/Protein/ProtHash.java
+ProteinInference_working_20.02.17/src/main/java/Protein/Protein.java
+ProteinInference_working_20.02.17/src/main/java/proteininference/Load.java
+ProteinInference_working_20.02.17/src/main/java/proteininference/ProteinInference.java
+com.mycompany_ProteinInference_optimise_21.02.17/nbactions.xml
+com.mycompany_ProteinInference_optimise_21.02.17/pom.xml
+com.mycompany_ProteinInference_optimise_21.02.17/src/main/java/Grouping/Group.java
