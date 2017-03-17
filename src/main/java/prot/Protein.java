@@ -1,7 +1,6 @@
+package prot;
 
-package Protein;
-
-import Peptide.Peptide;
+import pep.Peptide;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,32 +10,29 @@ public class Protein {
     private List<String> pepNames;
     private List<Peptide> pepList;
     private List<Double> quants;
-    public boolean isDistinct, isSameSet, isSubset, isMutSub, 
+    public boolean isDistinct, isSameSet, isSubset, isMutSub,
             isAssigned, isHeadProt, isDiscarded, isGroupMember;
     private int pepNo;
     private String protType;
     
-    public Protein(String protName) {
-                
-        this.protName = protName;
+    public Protein(String prot) {
+
+        this.protName = prot;
         this.pepList = new ArrayList<>();
         this.pepNames = new ArrayList<>();
         this.quants = new ArrayList<>();
-        
+
         pepNo = 0;
-        
+
         isDistinct = false;
         isSameSet = false;
-        isSubset = false;
         isMutSub = false;
-        
+
         isAssigned = false;
         isDiscarded = false;
         isHeadProt = false;
-        isGroupMember = false;
         protType = "";
     }
-    
     public boolean pepInList(String pep) {
         boolean bool = false;
         List <String> pepN = this.pepNames;
@@ -44,23 +40,23 @@ public class Protein {
             if (p.trim().contains(pep)) {
                 bool = true;
             }
-        }    
+        }
         return bool;
     }
-    public void addPepNames(String pep){        
+    public void addPepNames(String pep) {
         this.pepNames.add(pep);
         this.pepNo++;
-    }  
-    public String getProtName() { 
+    }
+    public String getProtName() {
         return this.protName;
     }
-    public void addPepList(Peptide pep){
-        this.pepList.add(pep);                
+    public void addPepList(Peptide pep) {
+        this.pepList.add(pep);
     }
-    public int getPepNo(){
+    public int getPepNo() {
         return this.pepNo;
     }
-    public List getPepList(){
+    public List getPepList() {
         return this.pepList;
     }
     public void makeDistinct() {
@@ -87,50 +83,52 @@ public class Protein {
         this.isDiscarded = true;
     }
     public void setQuantSum(int num) {
-        List<Peptide> pepList = this.pepList;
+        List<Peptide> peps = this.pepList;
         for (int i = 0; i < num; i++) {
             Double tempVal = 0.0;
-            for (Peptide pep : pepList) {
-                if(!pep.isConflicted) {
-                    tempVal = tempVal + pep.getQuantVals(i);                
+            for (Peptide pep : peps) {
+                if (!pep.isConflicted) {
+                    tempVal = tempVal + pep.getQuantVals(i);
                 }
             }
             this.quants.add(i, tempVal);
-            //System.out.println("Prot: " + this.protName + " - " + i + " - " + this.quants.get(i));
+            //System.out.println("Prot: " + this.protName + " - " + i 
+            //        + " - " + this.quants.get(i));
         }
-
     }
     public void setQuantHi3(int num) {
-        List<Peptide> pepList = this.pepList;
+        List<Peptide> pepL = this.pepList;
         int hiN = 3;
-        int peps = pepList.size();
+        int peps = pepL.size();
         int loop = hiN;
-        if (peps < hiN)
+        if (peps < hiN) {
             loop = peps;
+        }
         for (int i = 0; i < num; i++) {
             Double tempVal = 0.0;
             for (int j = 0; j < loop; j++) {
-                if(!pepList.get(j).isConflicted) {
-                    tempVal = tempVal + pepList.get(j).getQuantVals(i);
+                if (!pepL.get(j).isConflicted) {
+                    tempVal = tempVal + pepL.get(j).getQuantVals(i);
                 }
             }
             this.quants.add(i, tempVal);
-            //System.out.println("Prot: " + this.protName + " - " + this.quants.get(i));
+            //System.out.println("Prot: " + this.protName 
+            //        + " - " + this.quants.get(i));
         }
     }
-    public String protType() {      
+    public String protType() {
         return this.protType;
     }
     public void makeHeadProt() {
         this.isHeadProt = true;
-    } 
+    }
     public double getQuant(int num) {
         return this.quants.get(num);
-    }    
-    public List getPepNames(){
+    }
+    public List getPepNames() {
         return this.pepNames;
     }
     public void makeGroupMember() {
         this.isGroupMember = true;
-    } 
+    }
 }

@@ -1,47 +1,50 @@
-
 package proteininference;
 
-import Grouping.GroupArray;
-import Peptide.PepArray;
-import Protein.ProtArray;
+import group.GroupArray;
+import pep.PepArray;
+import prot.ProtArray;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class ProteinInference {
 
-    public static void main(String[] args) {       
-        
+    public static void main(String[] args) throws IOException {
+
         PepArray peptides = new PepArray();
         ProtArray proteins = new ProtArray();
         GroupArray protGroups = new GroupArray();
-        
+
         // Set the input format
         String inputFormat = "csv";
         //String inputFormat = "mzq";
-        
+
         // Set the protein quantification method
         //String quantMethod = "hi3";
         String quantMethod = "sum";
-        
-        int repNum = 12; 
-        
+
+        int repNum = 12;
+
         //String fileName = "ProgenesisFormat.csv";
-        String fileName = "PXD001819_P_PeptideIon_All_NG_20.09.16.csv";
+        //String fileName = "PXD001819_P_PeptideIon_All_NG_20.09.16.csv";
         //String fileName = "PXD002099_P_PeptideIon_All_NG_21.09.16.csv";
-        //String fileName = "ExampleDataProgenesis.csv";
+        String fileName = "ExampleDataProgenesis.csv";
         //String fileName = "ExampleData.mzq";
         //String fileName = "testInput.mzq";
         //String fileName = "AllAgesRawPeptidesOnly.mzq"; 
-        
+
         String tempLine = "";
         String splitBy = ",";
         String[] pepProperties = null;
@@ -50,14 +53,14 @@ public class ProteinInference {
         String prot = "";
         String charge = ";";
         String featNo = "";
-        
+
         // Method to read in Progenesis petide ion csv
         if ("csv".equals(inputFormat)) {
             try {
-                BufferedReader inputFile = 
-                        new BufferedReader(new FileReader(fileName)); 
+                BufferedReader inputFile =
+                        new BufferedReader(new FileReader(fileName));
                 //System.out.println("1");
-                while((tempLine = inputFile.readLine()) != null) {
+                while ((tempLine = inputFile.readLine()) != null) {
                     if (count <= 3 ) {
                         count++;
                         //System.out.println("2");
@@ -76,29 +79,29 @@ public class ProteinInference {
                         for (int i = 30; i <= 41; i++) {
                             Double val = Double.parseDouble(pepProperties[i]);
                             rawAbund.add(val);
-                        }                    
-                        peptides.buildFromCSV(pep, prot, rawAbund);
-                        proteins.buildFromCSV(prot, pep);
+                        }
+                        peptides.processOneRowCSV(pep, prot, rawAbund);
+                        proteins.processOneRowCSV(prot, pep);
                     }
-                }    
-            } catch (Exception e) {System.out.println("Unable to read " + fileName);}
+                }
+            } catch (IOException | NumberFormatException e) {}
         }
         // Method ot read in mzq file
         if ("mzq".equals(inputFormat)) {
             try {
                 File inputFile = new File(fileName);
-                DocumentBuilderFactory dbFactory 
+                DocumentBuilderFactory dbFactory
                     = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
                 Document doc = dBuilder.parse(inputFile);
                 doc.getDocumentElement().normalize();
-                NodeList nList = doc.getElementsByTagName("Protein");         
+                NodeList nList = doc.getElementsByTagName("Protein");
                 for (int temp = 0; temp < nList.getLength(); temp++) {
                     Node nNode = nList.item(temp);
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element eElement = (Element) nNode;
                         // Selects protein information
-                        prot = eElement.getAttribute("accession");               
+                        prot = eElement.getAttribute("accession");
                         int pepNum = eElement.getElementsByTagName("PeptideConsensus_refs")
                                 .getLength();
                         for (int n = 0; n < pepNum; n++) {
@@ -106,23 +109,23 @@ public class ProteinInference {
                                     .item(n).getTextContent();
                             String sub = XMLpeps.substring(4);
                             String[] peps = sub.split("pep_");
-                            proteins.buildFromMZQ(prot, peps);
+                            proteins.processProteinTagMZQ(prot, peps);
                             //System.out.println("Prot: " + prot);
                             //System.out.print("Peps: ");
                             for (String p : peps) {
                                 //System.out.print(p);
-                                peptides.buildFromMZQ(p.replace(" ", ""), prot);
+                                peptides.processPeptideMZQ(p.replace(" ", ""), prot);
                             }
-                            //System.out.println();                            
+                            //System.out.println();
                         }
                     }
                 }
-                NodeList qList = doc.getElementsByTagName("AssayQuantLayer");            
+                NodeList qList = doc.getElementsByTagName("AssayQuantLayer");
                 for (int temp = 0; temp < qList.getLength(); temp++) {
                     Node qNode = qList.item(temp);
 
                     if (qNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element qElement = (Element) qNode;                 
+                        Element qElement = (Element) qNode;
                         NodeList qrows = qElement.getElementsByTagName("Row");
 
                         for (int n = 0; n < qrows.getLength(); n++) {
@@ -134,11 +137,11 @@ public class ProteinInference {
                                 String pepRef = qrowElement.getAttribute("object_ref");
                                 pepRef = pepRef.substring(4);
                                 //System.out.println("Pep: " + pepRef);
-                                String quantString = qrowElement.getFirstChild().getNodeValue();                          
+                                String quantString = qrowElement.getFirstChild().getNodeValue();
                                 String[] quantVals = quantString.split(" ");
-                                ArrayList<Double> quantV = new <Double>ArrayList();                              
-                                
-                                for (String val : quantVals) {                                
+                                ArrayList<Double> quantV = new <Double>ArrayList();                 
+
+                                for (String val : quantVals) {
                                     double dVal = Double.parseDouble(val);
                                     quantV.add(dVal);
                                     //System.out.print(dVal + " ");
@@ -146,24 +149,24 @@ public class ProteinInference {
                                 peptides.assignMZQquants(pepRef.replace(" ", ""), quantV);
                                 //System.out.println();
                             }
-                        }               
+                        }
                     }
                 }
-            } catch (Exception e) {e.printStackTrace();}            
+            } catch (ParserConfigurationException | SAXException | IOException | DOMException | NumberFormatException e) {}
         }
-        // Maps the proteins and peptides to each other      
+        // Maps the proteins and peptides to each other
         peptides.assignProtList(proteins);
         proteins.assignPepList(peptides);
-        
+
         // Discards proteins mapped by 0 or 1 peptide
         proteins.discardNonIdent();
         proteins.discardSingleIdent();
-        
+
         // Orders the arrays by the number of proteins/peptides mapped
         // Proteins - decreasing peptide number
         // Peptides - increasing protein number
-        peptides.orderPeps();
-        proteins.orderProts();        
+        peptides.orderPepsByProtCount();
+        proteins.orderProtsByPepCount();
 
         // Assigns proteins and peptides
         peptides.setUniquePeptides();
@@ -171,14 +174,14 @@ public class ProteinInference {
         proteins.setSameSetProts(protGroups);
         proteins.setMutSubProts(protGroups);
         proteins.discardProts(protGroups);
-        peptides.setConflictedPeptides();        
+        peptides.setConflictedPeptides();
 
         // Quantifies proteins
         proteins.setQuants(quantMethod, repNum);
-        
+
         // Saves outputs as csv files
         peptides.savePeps("peptides" + fileName + ".csv", repNum);
-        proteins.saveProts("proteins" + fileName + ".csv");   
-        protGroups.saveGroups("protGroups" + fileName + ".csv", repNum);        
+        proteins.saveProts("proteins" + fileName + ".csv");
+        protGroups.saveGroups("protGroups" + fileName + ".csv", repNum);
     }
 }

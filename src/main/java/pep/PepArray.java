@@ -1,7 +1,7 @@
+package pep;
 
-package Peptide;
-
-import Protein.*;
+import prot.Protein;
+import prot.ProtArray;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -10,39 +10,41 @@ import java.util.List;
 
 
 public class PepArray {
-    
-    private ArrayList<Peptide> peptides;   
-    private Peptide tempPep = null;
+
+    private ArrayList<Peptide> peptides;
 
     public PepArray() {
-        
+
         peptides = new <Peptide>ArrayList();
     }
-   
-    public void buildFromCSV(String pep, String prot, List<Double> abund) {     
+
+    public void processOneRowCSV(String pep, String prot, List<Double> abund) {
+        Peptide tempPep = null;
         tempPep = checkPep(pep);
         tempPep.addProtNames(prot);
         tempPep.setQuantVals(abund);
     }
-    public void buildFromMZQ(String pep, String prot) {     
+    public void processPeptideMZQ(String pep, String prot) {
+        Peptide tempPep = null;
         tempPep = checkPep(pep);
         tempPep.addProtNames(prot);
     }
     public void assignMZQquants(String pep, ArrayList<Double> abund) {
+        Peptide tempPep = null;
         tempPep = checkPep(pep);
         tempPep.setQuantVals(abund);
-    }    
+    }
     public void assignProtList(ProtArray prots) {
         for (Peptide p : peptides) {
             List<String> protNames = p.getProtNames();
             for (String name : protNames) {
                 Protein protein = prots.retProt(name);
-                p.addProtList(protein);                
+                p.addProtList(protein);
             }
             //System.out.println(p.getPepName() + ": " + p.getProtNo());
         }
     }
-    public void orderPeps() {
+    public void orderPepsByProtCount() {
         // sort peptides by number of proteins assigned
         // Ascending
         Collections.sort(peptides,
@@ -57,35 +59,36 @@ public class PepArray {
     }
     public void setUniquePeptides() {
         for (Peptide p : peptides) {
-            if (p.getProtNo() == 1) 
-                p.makeUnique();            
-        }        
+            if (p.getProtNo() == 1) {
+                p.makeUnique();
+            }               
+        }
     }
     public void setConflictedPeptides() {
         for (Peptide p : peptides) {
-            List<Protein> prots = p.getProtList();
             if (p.isClaimed && !p.isUnique && !p.isResolved) {
                 p.makeConflicted();
             }
-        }    
+        }
     }
     public void savePeps(String fname, int num) {
         //System.out.println("Peps: " + peptides.size());
-        try {            
+        try {
             PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);
             outFile.println("PepName ,ProtNo , pepType");
 //                    + "isUnique ,isResolved "
 //                    + ",isConflicted ,isClaimed, fromDistinct ,fromSameSet "
 //                    + ",fromSubSet ,fromMutSub" );
             for (Peptide p : peptides) {
-                outFile.print(p.getPepName()+ "," + p.getProtNo() + "," + p.pepType() + ",");
+                outFile.print(p.getPepName() + "," + p.getProtNo() 
+                        + "," + p.pepType() + ",");
                 for (int i = 0; i < num; i++) {
                     outFile.print(p.getQuantVals(i) + ",");
                 }
                 outFile.println();
-//                        p.isUnique + "," + p.isResolved 
-//                        + "," + p.isConflicted + "," + p.isClaimed + "," 
-//                        + p.fromDistinct + "," + p.fromSameSet + "," 
+//                        p.isUnique + "," + p.isResolved
+//                        + "," + p.isConflicted + "," + p.isClaimed + ","
+//                        + p.fromDistinct + "," + p.fromSameSet + ","
 //                        + p.fromSubSet + "," + p.fromMutSub);
             }
             outFile.close();
@@ -94,25 +97,30 @@ public class PepArray {
     public Peptide retPep(String pp) {
         Peptide tmpPep = null;
         for (Peptide p : peptides) {
-            if (pp.equals(p.getPepName())) 
-                tmpPep = p;                 
+            if (pp.equals(p.getPepName())) {
+                tmpPep = p;
             }
+        }
         return tmpPep;
     }
-    private Peptide checkPep(String pep) {        
+    private Peptide checkPep(String pep) {
+        Peptide tempPep = null;
         // If the peptide hasn't been assigned
-        if(!checkPeps(pep)) 
-            tempPep = newPep(pep);                      
-        else 
+        if (!checkPeps(pep)) {
+            tempPep = newPep(pep);
+        }
+        else {
             tempPep = retPep(pep);
+        }
         return tempPep;
     }
-    private boolean checkPeps(String pn){
+    private boolean checkPeps(String pn) {
         for (Peptide p : peptides) {
-            if (pn.equals(p.getPepName()))
-                return true;                 
+            if (pn.equals(p.getPepName())) {
+                return true;
+            }
         }
-        return false;        
+        return false; 
     }
     private Peptide newPep(String pp) {
         // Create new peptide object
@@ -120,5 +128,5 @@ public class PepArray {
         // Add peptide to the block of peptides
         peptides.add(tmpPep);
         return tmpPep;
-    }   
+    }
 }
