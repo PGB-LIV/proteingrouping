@@ -6,14 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 /**
  * Creates a Group object
- * 
- * @param   gh  the Protein object that heads the protein group
  */
 public class Group {
 
     private List<Protein> group;
     private final Protein groupHead;
-
+    /**
+     * Creates a Group object
+     * 
+     * @param   gh  the Protein object that heads the protein group
+     */
     public Group(Protein gh) {
 
         this.group = new ArrayList<>();

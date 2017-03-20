@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utils;
 
 import java.io.BufferedReader;
@@ -16,15 +11,17 @@ import pep.Peptide;
  * Provides methods to read in data.
  * Methods provided for Progenesis peptide ion and peptide output
  * and mzq file.
- * 
- * @param   fileIn  the name and location of the input file
  */
 public class ReadIn {
 
     public ReadIn() {
         
     }
-
+    /**
+     * Provides methods to read in Progenesis peptide ion data.
+     * 
+     * @param   fileIn  the name and location of the input file
+     */
     public static List<String> readInCSV(String fileName) {
         int count = 1;
         String tempLine = "";

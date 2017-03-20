@@ -13,7 +13,7 @@ public class Peptide {
     public boolean isUnique, isResolved, isConflicted, isClaimed, fromSameSet,
             fromDistinct, fromSubSet, fromMutSub;
     private int protNo;
-    
+
     /**
      * Creates a Peptide object
      * 
@@ -38,8 +38,12 @@ public class Peptide {
         fromDistinct = false;
         fromSubSet = false;
         fromMutSub = false;
-        
     }
+    /**
+     * Creates a Peptide object
+     * 
+     * @param   pepName the peptide sequence, charge state and retention time
+     */
     public void addProtNames(String prot) {
         if (this.protNo == 0) {
             this.protNames.add(prot);

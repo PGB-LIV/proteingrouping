@@ -12,13 +12,15 @@ import prot.Protein;
 
 /**
  * Provides methods to save output.
- * 
- * @param   fileOut  the name and location of the output file
  */
 public class Save {
         
     public Save() {
-        
+    /**
+     * Provides methods to save output.
+     * 
+     * @param   fileOut  the name and location of the output file
+     */    
     }
         public void savePeps(String fname, int num, PepArray peptides) {
         //System.out.println("Peps: " + peptides.size());

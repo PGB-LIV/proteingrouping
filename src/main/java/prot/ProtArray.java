@@ -1,23 +1,17 @@
-
 package prot;
 
 import pep.PepArray;
 import pep.Peptide;
 import group.Group;
 import group.GroupArray;
-
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Iterator;
 
-
 /**
  * Creates an array of Protein objects
  */
-
 public class ProtArray {
     
     private ArrayList<Protein> proteins;
