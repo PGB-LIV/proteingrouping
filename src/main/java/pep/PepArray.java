@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Creates an array of Peptides objects
- * 
+ * Creates an array of Peptides objects.
+ *
  */
 public class PepArray {
 
@@ -86,7 +86,7 @@ public class PepArray {
         for (Peptide p : peptides) {
             if (p.getProtNo() == 1) {
                 p.makeUnique();
-            }               
+            }          
         }
     }
     public void setConflictedPeptides() {
@@ -132,7 +132,7 @@ public class PepArray {
                 return true;
             }
         }
-        return false; 
+        return false;
     }
     private Peptide newPep(String pp) {
         // Create new peptide object

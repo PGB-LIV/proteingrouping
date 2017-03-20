@@ -15,9 +15,8 @@ public class Peptide {
     private int protNo;
 
     /**
-     * Creates a Peptide object
-     * 
-     * @param   pepName the peptide sequence, charge state and retention time
+     * Creates a Peptide object.
+     *
      */
 
     public Peptide(String pepName) {
@@ -40,9 +39,9 @@ public class Peptide {
         fromMutSub = false;
     }
     /**
-     * Creates a Peptide object
-     * 
-     * @param   pepName the peptide sequence, charge state and retention time
+     * Creates a Protein object.
+     *
+     * @param   prot the peptide sequence, charge state and retention time.
      */
     public void addProtNames(String prot) {
         if (this.protNo == 0) {
@@ -52,7 +51,7 @@ public class Peptide {
             //System.out.println(protNo);
         }
         List <String> protN = this.protNames;
-        if(!protN.contains(prot)) {
+        if (!protN.contains(prot)) {
             this.protNames.add(prot);
             //System.out.print(prot + ": ");
             this.protNo++;
@@ -94,18 +93,19 @@ public class Peptide {
         int count = 0;
         if (isUnique) {
             type = "Unique";
-            count ++;
+            count++;
         }
         if (isResolved) {
             type = "Resolved";
-            count ++;
+            count++;
         }
         if (isConflicted) {
             type = "Conflicted";
-            count ++;
+            count++;
         }
-        if (count !=1)
-            type = ("pepType error");
+        if (count != 1) {
+            type = "pepType error";
+        }
         return type;
     }
     public double getQuantVals(int num) {

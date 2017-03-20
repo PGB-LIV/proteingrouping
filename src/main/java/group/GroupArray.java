@@ -5,7 +5,7 @@ import prot.Protein;
 import java.util.ArrayList;
 import java.util.List;
 /**
- * Creates an array of Group objects
+ * Creates an array of Group objects.
  * 
  */
 public class GroupArray {
@@ -25,8 +25,9 @@ public class GroupArray {
         for (Group g : groups) {
             List<Peptide> list = g.getHeadProtPepList();
             for (Peptide p : list) {
-                if (p.equals(pep))
+                if (p.equals(pep)) {
                     gp = g;
+                }
             }
         }
         return gp;

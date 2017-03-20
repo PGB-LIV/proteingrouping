@@ -7,22 +7,20 @@ import utils.ReadIn;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import utils.Save;
 
 public class ProteinInference {
 
     public static void main(String[] args) throws IOException {
 
-        ReadIn read = new ReadIn();
         List<String> inputData = new ArrayList<String>();
-        
+
         PepArray peptides = new PepArray();
         ProtArray proteins = new ProtArray();
         GroupArray protGroups = new GroupArray();
 
         // Set the input format
-        String inputFormat = "csv";
+        //String inputFormat = "csv";
         //String inputFormat = "mzq";
 
         // Set the protein quantification method
@@ -70,10 +68,10 @@ public class ProteinInference {
         // Quantifies proteins
         proteins.setQuants(quantMethod, repNum);
 
-         //Saves outputs as csv files
+        //Saves outputs as csv files
         Save saveAs = new Save();
-        saveAs.savePeps(outputPath + "peptides" + fileName, repNum, peptides);
-        saveAs.saveProts(outputPath + "proteins" + fileName, proteins);
-        saveAs.saveGroups(outputPath + "protGroups" + fileName, repNum, protGroups);
+        saveAs.savePeps(outputPath + "peps_" + fileName, repNum, peptides);
+        saveAs.saveProts(outputPath + "prots_" + fileName, proteins);
+        saveAs.saveGroups(outputPath + "PG_" + fileName, repNum, protGroups);
     }
 }

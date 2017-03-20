@@ -14,15 +14,15 @@ import prot.Protein;
  * Provides methods to save output.
  */
 public class Save {
-        
+
     public Save() {
     /**
      * Provides methods to save output.
-     * 
-     * @param   fileOut  the name and location of the output file
-     */    
+     *
+     * @param   fileOut  the name and location of the output file.
+     */
     }
-        public void savePeps(String fname, int num, PepArray peptides) {
+    public void savePeps(String fname, int num, PepArray peptides) {
         //System.out.println("Peps: " + peptides.size());
         try {
             PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);
@@ -32,7 +32,7 @@ public class Save {
 //                    + ",fromSubSet ,fromMutSub" );
             for (int i = 0; i < peptides.getSize(); i++) {
                 Peptide p = peptides.getPep(i);
-                outFile.print(p.getPepName() + "," + p.getProtNo() 
+                outFile.print(p.getPepName() + "," + p.getProtNo()
                         + "," + p.pepType() + ",");
                 for (int j = 0; j < num; j++) {
                     outFile.print(p.getQuantVals(j) + ",");
@@ -52,7 +52,8 @@ public class Save {
             outFile.println("Protein ,PepNo ,ProtType ,Discarded? ,Peptides");
             for (int i = 0; i < proteins.getSize(); i++) {
                 Protein p = proteins.getProt(i);
-                outFile.print(p.getProtName()+ "," + p.getPepNo() + "," + p.protType() + "," + p.isDiscarded + ",");                
+                outFile.print(p.getProtName() + "," + p.getPepNo() + "," 
+                        + p.protType() + "," + p.isDiscarded + ",");      
                 List<Peptide> peps = p.getPepList();
                 for (Peptide ps : peps) {
                     outFile.print(ps.getPepName() + "," + ps.getProtNo() + ",");
@@ -89,6 +90,9 @@ public class Save {
                 }
             }
             outFile.close();
-        } catch (Exception e) {System.out.println("Unable to save to " + fname);}
+        } catch (Exception e) {
+            System.out.println("Unable to save to " + fname);
+        }
     }
 }
+

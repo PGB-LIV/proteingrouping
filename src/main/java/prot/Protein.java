@@ -15,13 +15,13 @@ public class Protein {
     private int pepNo;
     private String protType;
     /**
-    * Creates a Protein object
-    * 
-    * @param    protNamne  the protein accession  
+    * Creates a Protein object.
+    *
+    * @param    prot  the protein accession.
     */
-    public Protein(String protName) {
+    public Protein(String prot) {
 
-        this.protName = protName;
+        this.protName = prot;
         this.pepList = new ArrayList<>();
         this.pepNames = new ArrayList<>();
         this.quants = new ArrayList<>();
@@ -96,7 +96,7 @@ public class Protein {
                 }
             }
             this.quants.add(i, tempVal);
-            //System.out.println("Prot: " + this.protName + " - " + i 
+            //System.out.println("Prot: " + this.protName + " - " + i
             //        + " - " + this.quants.get(i));
         }
     }
@@ -116,7 +116,7 @@ public class Protein {
                 }
             }
             this.quants.add(i, tempVal);
-            //System.out.println("Prot: " + this.protName 
+            //System.out.println("Prot: " + this.protName
             //        + " - " + this.quants.get(i));
         }
     }

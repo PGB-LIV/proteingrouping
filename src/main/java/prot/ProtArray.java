@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Iterator;
 
 /**
- * Creates an array of Protein objects
+ * Creates an array of Protein objects.
  */
 public class ProtArray {
-    
+
     private ArrayList<Protein> proteins;
-    
+
     public ProtArray() {
-        
+
         proteins = new <Protein>ArrayList(); 
     }
         public void buildProtArray(List<String> input) {
@@ -37,10 +37,10 @@ public class ProtArray {
             charge = pepProperties[2];
             seq = pepProperties[8];
             pep = seq + "_" + charge + "_" + featNo;
-            
+
             prot = pepProperties[10];
             tempProt = checkProt(prot);
-            
+
             tempProt.addPepNames(pep);
         }
     }
@@ -61,20 +61,20 @@ public class ProtArray {
             for (String name : pepNames) {
                 Peptide peptide = peps.retPep(name);
                 //System.out.println(peptide.getPepName());
-                p.addPepList(peptide);                
+                p.addPepList(peptide);
             }
         }
-    } 
+    }
     // Removes proteins 
     public void discardNonIdent() {
         Iterator<Protein> iter = proteins.iterator();
         while (iter.hasNext()) {
             Protein p = iter.next();
-            if(p.getPepNo() == 0) {
+            if (p.getPepNo() == 0) {
                 iter.remove();
             }
         }
-    }    
+    }
     public void orderProtsByPepCount() {        
         // Sort proteins by number of peptides mapped to them
         // Descending
@@ -82,17 +82,17 @@ public class ProtArray {
             (protein1, protein2) -> protein2.getPepNo()
                     - protein1.getPepNo());
         for (Protein p : proteins) {
-            List<Peptide> peps = p.getPepList(); // this is problem line - XML only
+            List<Peptide> peps = p.getPepList();
             Collections.sort(peps,
                     (pep1, pep2) -> pep1.getProtNo()
                     - pep2.getProtNo());
         }
-    } 
-    public void setDistinctProts(GroupArray pg) {        
+    }
+    public void setDistinctProts(GroupArray pg) {
         for (Protein p : proteins) {
             List<Peptide> peps = p.getPepList();
             for (Peptide pep : peps) {
-                if(pep.isUnique && !p.isDistinct) { 
+                if (pep.isUnique && !p.isDistinct) {
                     p.makeDistinct();
                     Group gp = new Group(p);
                     pg.addGroup(gp);
@@ -101,43 +101,44 @@ public class ProtArray {
                         pp.fromDistinct();
                     }
                 }
-            }            
-        }        
+            }
+        }
     }
     public void setSameSetProts(GroupArray pg) {
         for (Protein p : proteins) {
             List<Peptide> peps = p.getPepList();
             for (Peptide pep : peps) {
-                if(!pep.isClaimed && !p.isAssigned) { 
+                if (!pep.isClaimed && !p.isAssigned) { 
                     p.makeSameSet();
                     Group gp = new Group(p);
                     pg.addGroup(gp);
-                    for (Peptide pp : peps) {                        
+                    for (Peptide pp : peps) {
                         pp.makeSameSet();
                         pp.makeClaimed();
-                        if(!pp.fromDistinct)
+                        if (!pp.fromDistinct) {
                             pp.makeResolved();
+                        }
                     }
                 }                
-                if(pep.fromSameSet && !p.isAssigned) {
+                if (pep.fromSameSet && !p.isAssigned) {
                     //Find the group head
                     Group gp = pg.getHeadPeps(pep);
-                    if(gp.samePeps(peps)) {
+                    if (gp.samePeps(peps)) {
                         gp.addProtToGroup(p);
                     }    
                     p.makeSubSet();
                     for (Peptide pp : peps) {
                         pp.makeClaimed();
                         pp.makeSubSet();
-                    }                    
-                }  
-            }            
-        }        
+                    }
+                }
+            }
+        }
     }
-    public void setMutSubProts(GroupArray pg){
+    public void setMutSubProts(GroupArray pg) {
         for (Protein p : proteins) {
             List<Peptide> peps = p.getPepList();
-            for (Peptide pep : peps) {                            
+            for (Peptide pep : peps) {
                 if (pep.isClaimed && !p.isAssigned) {
                     List<Group> gps = new ArrayList<>();
                     for (Peptide pp : peps) {
@@ -150,17 +151,17 @@ public class ProtArray {
                             gp.addProtToGroup(p);
                         }
                         //}
-                    }      
-                    p.makeMutSub();                    
-                }                
+                    }
+                    p.makeMutSub();
+                }
             }
         }
-    } 
+    }
     public void discardProts(GroupArray pg) {
         Group gp = null;
         for (Protein p: proteins) {
-            if(p.isSameSet) {
-                int headPepNo = p.getPepNo();                
+            if (p.isSameSet) {
+                int headPepNo = p.getPepNo();
                 gp = pg.getGroup(p);
                 if (gp != null) {
                     List<Protein> prots = gp.getProtGroupList();
@@ -168,15 +169,15 @@ public class ProtArray {
                         List<Peptide> peps = pr.getPepList();
                         if (headPepNo > pr.getPepNo()) {
                             pr.makeDiscarded();
-                            for (Peptide pep : peps) {  
+                            for (Peptide pep : peps) {
                                 pep.unClaim();
                                 pep.makeResolved();
-                            }    
-                        }                            
+                            }
+                        }
                     }
-                }                    
+                }
             }
-            if(p.isMutSub) {
+            if (p.isMutSub) {
                 p.makeDiscarded();
                 List<Peptide> peps = p.getPepList();
                 for (Peptide pep : peps) {
@@ -190,7 +191,7 @@ public class ProtArray {
     }
     public void discardSingleIdent() {
         for (Protein p : proteins) {
-            if(p.getPepNo() <= 1) {
+            if (p.getPepNo() <= 1) {
                 p.makeDiscarded();
                 List<Peptide> peps = p.getPepList();
             }
@@ -198,7 +199,7 @@ public class ProtArray {
     }
     public void setQuants(String method, int num) {        
         for (Protein p: proteins) {
-            if(p.isHeadProt && !p.isDiscarded) {
+            if (p.isHeadProt && !p.isDiscarded) {
                 if ("hi3".equals(method)) {
                     p.setQuantHi3(num);
                 }
@@ -210,7 +211,7 @@ public class ProtArray {
     }
     public boolean checkProts(String prn){
         for (Protein pr : proteins) {
-            if (prn.equals(pr.getProtName())) {             
+            if (prn.equals(pr.getProtName())) {
                 return true;
             }
         }
@@ -236,16 +237,16 @@ public class ProtArray {
     }
     private Protein checkProt(String prot) {
         Protein tempProt = null;
-        if(!checkProts(prot)) { 
+        if (!checkProts(prot)) {
             tempProt = newProt(prot);
             //System.out.println("new prot: " + prot);
         }
         else {
             tempProt = retProt(prot);
             //System.out.println("ret prot: " + prot);
-        }    
+        }
         return tempProt;
-    } 
+    }
     private Protein newProt(String pt) {
         Protein tmpProt = new Protein(pt);
         // Add it to the block of proteins

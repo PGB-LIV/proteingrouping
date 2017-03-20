@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import pep.Peptide;
 
 /**
  * Provides methods to read in data.
@@ -19,16 +18,16 @@ public class ReadIn {
     }
     /**
      * Provides methods to read in Progenesis peptide ion data.
-     * 
-     * @param   fileIn  the name and location of the input file
+     *
+     * @param   fileName    the name and location of the input file
+     * @return  data        lines of csv data
      */
     public static List<String> readInCSV(String fileName) {
         int count = 1;
         String tempLine = "";
-        String splitBy = ",";
         List<String> data = new ArrayList<String>();
         String[] pepProperties = null;
-        
+
         try {
             BufferedReader inputFile =
                     new BufferedReader(new FileReader(fileName));
@@ -41,9 +40,9 @@ public class ReadIn {
                     //System.out.println(tempLine);
                 }
             }
-        } catch (IOException | NumberFormatException e) {}
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Unable to read " + fileName);
+        }
     return data;
-}
-
-    
+    }
 }
