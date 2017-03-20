@@ -4,7 +4,11 @@ import pep.Peptide;
 import prot.Protein;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Creates a Group object
+ * 
+ * @param   gh  the Protein object that heads the protein group
+ */
 public class Group {
 
     private List<Protein> group;

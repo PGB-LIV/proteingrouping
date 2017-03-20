@@ -13,8 +13,11 @@ public class Peptide {
     public boolean isUnique, isResolved, isConflicted, isClaimed, fromSameSet,
             fromDistinct, fromSubSet, fromMutSub;
     private int protNo;
+    
     /**
-     * Class to create a Peptide object
+     * Creates a Peptide object
+     * 
+     * @param   pepName the peptide sequence, charge state and retention time
      */
 
     public Peptide(String pepName) {

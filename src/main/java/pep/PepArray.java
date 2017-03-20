@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+/**
+ * Creates an array of Peptides objects
+ * 
+ */
 public class PepArray {
 
     private ArrayList<Peptide> peptides;
@@ -17,12 +20,36 @@ public class PepArray {
 
         peptides = new <Peptide>ArrayList();
     }
-
-    public void processOneRowCSV(String pep, String prot, List<Double> abund) {
+    public void buildPepArray(List<String> input) {
         Peptide tempPep = null;
-        tempPep = checkPep(pep);
-        tempPep.addProtNames(prot);
-        tempPep.setQuantVals(abund);
+        String[] pepProperties = null;
+        String splitBy = ",";
+        String pep = "";
+        String prot = "";
+        String charge = ";";
+        String featNo = "";
+        String seq = "";
+
+        for (String line : input) {
+            pepProperties = line.split(splitBy);
+
+            featNo = pepProperties[0];
+            charge = pepProperties[2];
+            seq = pepProperties[8];
+            pep = seq + "_" + charge + "_" + featNo;
+            tempPep = checkPep(pep);
+
+            prot = pepProperties[10];
+            tempPep.addProtNames(prot);
+
+            List<Double> rawAbund = new ArrayList<>();
+            //System.out.println(rawAbund);
+            for (int i = 30; i <= 41; i++) {
+                Double val = Double.parseDouble(pepProperties[i]);
+                rawAbund.add(val);
+            }
+            tempPep.setQuantVals(rawAbund);
+        }
     }
     public void processPeptideMZQ(String pep, String prot) {
         Peptide tempPep = null;
@@ -71,28 +98,15 @@ public class PepArray {
             }
         }
     }
-    public void savePeps(String fname, int num) {
-        //System.out.println("Peps: " + peptides.size());
-        try {
-            PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);
-            outFile.println("PepName ,ProtNo , pepType");
-//                    + "isUnique ,isResolved "
-//                    + ",isConflicted ,isClaimed, fromDistinct ,fromSameSet "
-//                    + ",fromSubSet ,fromMutSub" );
-            for (Peptide p : peptides) {
-                outFile.print(p.getPepName() + "," + p.getProtNo() 
-                        + "," + p.pepType() + ",");
-                for (int i = 0; i < num; i++) {
-                    outFile.print(p.getQuantVals(i) + ",");
-                }
-                outFile.println();
-//                        p.isUnique + "," + p.isResolved
-//                        + "," + p.isConflicted + "," + p.isClaimed + ","
-//                        + p.fromDistinct + "," + p.fromSameSet + ","
-//                        + p.fromSubSet + "," + p.fromMutSub);
-            }
-            outFile.close();
-        } catch (Exception e) {System.out.println("Unable to save to " + fname);}
+    public int getSize() {
+        return peptides.size();
+    }
+    public Peptide getPep(int index) {
+        Peptide tempPep = null;
+        for (int i = 0; i < peptides.size(); i++) {
+            tempPep = peptides.get(index);
+        }
+        return tempPep;
     }
     public Peptide retPep(String pp) {
         Peptide tmpPep = null;

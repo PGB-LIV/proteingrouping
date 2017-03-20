@@ -14,10 +14,14 @@ public class Protein {
             isAssigned, isHeadProt, isDiscarded, isGroupMember;
     private int pepNo;
     private String protType;
-    
-    public Protein(String prot) {
+    /**
+    * Creates a Protein object
+    * 
+    * @param    protNamne  the protein accession  
+    */
+    public Protein(String protName) {
 
-        this.protName = prot;
+        this.protName = protName;
         this.pepList = new ArrayList<>();
         this.pepNames = new ArrayList<>();
         this.quants = new ArrayList<>();
