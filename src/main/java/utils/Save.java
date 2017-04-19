@@ -15,6 +15,9 @@ import prot.Protein;
  */
 public class Save {
 
+    /**
+     *
+     */
     public Save() {
     /**
      * Provides methods to save output.
@@ -22,14 +25,49 @@ public class Save {
      * @param   fileOut  the name and location of the output file.
      */
     }
+
+    /**
+     *
+     * @param fname
+     * @param num
+     * @param peptides
+     */
     public void savePeps(String fname, int num, PepArray peptides) {
         //System.out.println("Peps: " + peptides.size());
         try {
             PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);
-            outFile.println("PepName ,ProtNo , pepType");
+            outFile.println("PepName ,ProtNo ,pepType ,Quants ,,,,,,,,,,,,Proteins");
 //                    + "isUnique ,isResolved "
 //                    + ",isConflicted ,isClaimed, fromDistinct ,fromSameSet "
 //                    + ",fromSubSet ,fromMutSub" );
+            for (int i = 0; i < peptides.getSize(); i++) {
+                Peptide p = peptides.getPep(i);
+                outFile.print(p.getPepName() + "," + p.getProtNo()
+                        + "," + p.pepType() + ",");
+                for (int j = 0; j < num; j++) {
+                    outFile.print(p.getQuantVals(j) + ",");
+                }
+                //System.out.println(p.getProtNames());
+                List<Protein> prots = p.getProtList();
+                for (int k = 0; k < prots.size(); k++) {
+                    Protein pr = prots.get(k);
+                    outFile.print(pr.getProtName() + ",");
+                }
+                outFile.println();
+//                        p.isUnique + "," + p.isResolved
+//                        + "," + p.isConflicted + "," + p.isClaimed + ","
+//                        + p.fromDistinct + "," + p.fromSameSet + ","
+//                        + p.fromSubSet + "," + p.fromMutSub);
+            }
+            outFile.close();
+        } catch (Exception e) {System.out.println("Unable to save to " + fname);}
+    }
+    public void saveMSstats(String fname, int num, PepArray peptides) {
+        try {
+            PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);
+            outFile.println(", Run ,pepprecursor ,Intensity ,ProteinName , "
+                    + "PeptideSequence ,PrecursorCharge ,COndition ,BioReplicate ,"
+                    + "Fragmentation ,ProductCharge ,IsotopeLabelType");
             for (int i = 0; i < peptides.getSize(); i++) {
                 Peptide p = peptides.getPep(i);
                 outFile.print(p.getPepName() + "," + p.getProtNo()
@@ -46,6 +84,11 @@ public class Save {
             outFile.close();
         } catch (Exception e) {System.out.println("Unable to save to " + fname);}
     }
+    /**
+     *
+     * @param fname
+     * @param proteins
+     */
     public void saveProts(String fname, ProtArray proteins) {
         try {
             PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);
@@ -63,6 +106,12 @@ public class Save {
             outFile.close();
         } catch (Exception e) {System.out.println("Unable to save to " + fname);}
     }
+
+    /**
+     *
+     * @param fname     * @param num
+     * @param groups
+     */
     public void saveGroups(String fname, int num, GroupArray groups) {
         try {
             PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);

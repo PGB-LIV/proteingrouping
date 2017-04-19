@@ -16,11 +16,19 @@ public class ProtArray {
 
     private ArrayList<Protein> proteins;
 
+    /**
+     *
+     */
     public ProtArray() {
 
         proteins = new <Protein>ArrayList(); 
     }
-        public void buildProtArray(List<String> input) {
+
+    /**
+     *
+     * @param input
+     */
+    public void buildProtArrayFromProgenesisPepIon(List<String> input) {
         Protein tempProt = null;
         String[] pepProperties = null;
         String splitBy = ",";
@@ -29,52 +37,74 @@ public class ProtArray {
         String charge = ";";
         String featNo = "";
         String seq = "";
-
+        String rt = "";
+        
         for (String line : input) {
             pepProperties = line.split(splitBy);
 
-            featNo = pepProperties[0];
-            charge = pepProperties[2];
-            seq = pepProperties[8];
-            pep = seq + "_" + charge + "_" + featNo;
+//            featNo = pepProperties[0];
+//            rt = pepProperties[1];
+//            charge = pepProperties[2];
+//            seq = pepProperties[8];
+//            pep = seq + "_" + charge + "_" + rt + "_" + featNo;
 
             prot = pepProperties[10];
             tempProt = checkProt(prot);
 
-            tempProt.addPepNames(pep);
+            //tempProt.addPepNames(pep);
         }
     }
     // Method to build array from .mzq file
-    public void processProteinTagMZQ(String prot, String[] peps) {
-        Protein tempProt = null;
-        tempProt = checkProt(prot);
-        for (String pep : peps) {
-            tempProt.addPepNames(pep.replace(" ", ""));                    
-        }
-    }
+
+    /**
+     *
+     * @param prot
+     * @param peps
+     */
+//    public void processProteinTagMZQ(String prot, String[] peps) {
+//        Protein tempProt = null;
+//        tempProt = checkProt(prot);
+//        for (String pep : peps) {
+//            tempProt.addPepNames(pep.replace(" ", ""));                    
+//        }
+//    }
     // Maps peptide objects to protein objects in array
-    public void assignPepList(PepArray peps) {
-        for (Protein p : proteins) {
-            //System.out.println(p.getProtName() + ": ");
-            List<String> pepNames = p.getPepNames();
-            //System.out.println(pepNames);
-            for (String name : pepNames) {
-                Peptide peptide = peps.retPep(name);
-                //System.out.println(peptide.getPepName());
-                p.addPepList(peptide);
-            }
-        }
-    }
+
+    /**
+     *
+     * @param peps
+     */
+//    public void assignPepList(PepArray peps) {
+//        for (Protein p : proteins) {
+//            //System.out.println(p.getProtName() + ": ");
+//            List<String> pepNames = p.getPepNames();
+//            //System.out.println(pepNames);
+//            for (String name : pepNames) {
+//                Peptide peptide = peps.retPep(name);
+//                //System.out.println(peptide.getPepName());
+//                p.addPepList(peptide);
+//            }
+//        }
+//    }
     // Removes proteins 
+
+    /**
+     *
+     */
     public void discardNonIdent() {
         Iterator<Protein> iter = proteins.iterator();
         while (iter.hasNext()) {
             Protein p = iter.next();
             if (p.getPepNo() == 0) {
                 iter.remove();
+                //System.out.println(p.getProtName());
             }
         }
     }
+
+    /**
+     *
+     */
     public void orderProtsByPepCount() {        
         // Sort proteins by number of peptides mapped to them
         // Descending
@@ -83,11 +113,17 @@ public class ProtArray {
                     - protein1.getPepNo());
         for (Protein p : proteins) {
             List<Peptide> peps = p.getPepList();
+            
             Collections.sort(peps,
                     (pep1, pep2) -> pep1.getProtNo()
                     - pep2.getProtNo());
         }
     }
+
+    /**
+     *
+     * @param pg
+     */
     public void setDistinctProts(GroupArray pg) {
         for (Protein p : proteins) {
             List<Peptide> peps = p.getPepList();
@@ -104,6 +140,11 @@ public class ProtArray {
             }
         }
     }
+
+    /**
+     *
+     * @param pg
+     */
     public void setSameSetProts(GroupArray pg) {
         for (Protein p : proteins) {
             List<Peptide> peps = p.getPepList();
@@ -135,6 +176,11 @@ public class ProtArray {
             }
         }
     }
+
+    /**
+     *
+     * @param pg
+     */
     public void setMutSubProts(GroupArray pg) {
         for (Protein p : proteins) {
             List<Peptide> peps = p.getPepList();
@@ -157,6 +203,11 @@ public class ProtArray {
             }
         }
     }
+
+    /**
+     *
+     * @param pg
+     */
     public void discardProts(GroupArray pg) {
         Group gp = null;
         for (Protein p: proteins) {
@@ -189,6 +240,10 @@ public class ProtArray {
             }
         }
     }
+
+    /**
+     *
+     */
     public void discardSingleIdent() {
         for (Protein p : proteins) {
             if (p.getPepNo() <= 1) {
@@ -197,6 +252,12 @@ public class ProtArray {
             }
         }
     }
+
+    /**
+     *
+     * @param method
+     * @param num
+     */
     public void setQuants(String method, int num) {        
         for (Protein p: proteins) {
             if (p.isHeadProt && !p.isDiscarded) {
@@ -206,9 +267,23 @@ public class ProtArray {
                 if ("sum".equals(method)) {
                     p.setQuantSum(num);
                 }
+                if ("ProgeneisHi3NonConflicting".equals(method)) {
+                    p.setQuantProHi3NC(num);                    
+                }
+            }
+        }
+        if ("ProgeneisHi3NonConflicting".equals(method)) {
+            for (Protein p: proteins) {
+                p.assignResolvedPepQuants();
             }
         }
     }
+
+    /**
+     *
+     * @param prn
+     * @return
+     */
     public boolean checkProts(String prn){
         for (Protein pr : proteins) {
             if (prn.equals(pr.getProtName())) {
@@ -217,6 +292,12 @@ public class ProtArray {
         }
         return false;
     }
+
+    /**
+     *
+     * @param pt
+     * @return
+     */
     public Protein retProt(String pt) {
         for (Protein pr : proteins) {
             if (pt.equals(pr.getProtName())) {
@@ -225,9 +306,20 @@ public class ProtArray {
         }
         return null;
     }
+
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return proteins.size();
     }
+
+    /**
+     *
+     * @param index
+     * @return
+     */
     public Protein getProt(int index) {
         Protein tempProt = null;
         for (int i = 0; i < proteins.size(); i++) {

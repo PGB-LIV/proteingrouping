@@ -4,29 +4,39 @@ import java.util.ArrayList;
 import java.util.List;
 import prot.Protein;
 
+/**
+ *
+ * @author hayle
+ */
 public class Peptide {
 
-    private String pepName;
-    private List<String> protNames;
+    private String pepIdent, seq;
+    private int charge, rt, featNo;
+    private List<String> protNames, mods;
     private List<Protein> protList;
     private List<Double> quantVals;
-    public boolean isUnique, isResolved, isConflicted, isClaimed, fromSameSet,
+    private Double aveAbund;
+    public boolean isUnique, isResolved, isConflicted, isClaimed, fromSameSet, 
             fromDistinct, fromSubSet, fromMutSub;
-    private int protNo;
+    private int protNo, modNo;
 
     /**
      * Creates a Peptide object.
      *
+     * @param pepName
      */
 
-    public Peptide(String pepName) {
+    public Peptide(String pep) {
 
-        this.pepName = pepName;
+        this.pepIdent = pep;
         this.protList = new ArrayList<>();
         this.protNames = new ArrayList<>();
         this.quantVals = new ArrayList<>();
+        this.mods = new ArrayList<>();
 
-        protNo = 0;
+        this.protNo = 0;
+        this.modNo = 0;
+        this.aveAbund = 0.0;
 
         isUnique = false;
         isResolved = false;
@@ -39,9 +49,25 @@ public class Peptide {
         fromMutSub = false;
     }
     /**
-     * Creates a Protein object.
+     * Adds modifications to the list.
      *
-     * @param   prot the peptide sequence, charge state and retention time.
+     * @param   mod the peptide sequence, charge state and retention time.
+     */
+    public void addMods(String mod) {
+        if (this.modNo == 0) {
+            this.mods.add(mod);
+            this.modNo++;
+        }
+        List <String> modList = this.mods;
+        if (!modList.contains(mod)) {
+            this.mods.add(mod);
+            this.modNo++;
+        }
+    }
+    /**
+     * Adds Protein to the list.
+     *
+     * @param   prot the protein name.
      */
     public void addProtNames(String prot) {
         if (this.protNo == 0) {
@@ -58,36 +84,111 @@ public class Peptide {
             //System.out.println(protNo);
         }
     }
+
+    /**
+     *
+     * @param vals
+     */
     public void setQuantVals(List<Double> vals) {
-        this.quantVals = vals;
+        int valNum = this.quantVals.size();
+        if (valNum == 0) {
+            this.quantVals = vals;
+        }
+        else {
+            List<Double> newQuants = new ArrayList<>();
+            for (int i = 0; i < valNum; i++) {
+                Double quant = this.quantVals.get(i);
+                Double newQuant = quant + vals.get(i);
+                newQuants.add(newQuant);
+            }
+            this.quantVals = newQuants;
+        }
     }
+    public void setAveAbund(Double abund) {
+        if (this.aveAbund == 0) {
+            this.aveAbund = abund;
+        }
+        else {
+            this.aveAbund = this.aveAbund + abund;
+        }
+    }
+    public Double getAveAbund() {
+        return this.aveAbund;
+    }
+
+    /**
+     *
+     * @return
+     */
     public List getProtNames() {
         return this.protNames;
     }
     // Gets the list of protein objects from the String name
+
+    /**
+     *
+     * @param prot
+     */
     public void addProtList(Protein prot) {
-        List <Protein> protList = this.protList;
-        for (Protein pr : protList) {
-            if (!pr.getProtName().equals(prot.getProtName())) {
+        int proNo = this.protList.size();
+        if (proNo == 0) {
+            this.protList.add(prot);
+        }
+        else {
+            List <Protein> prots = this.protList;
+            for (int i = 0; i < prots.size(); i++) {
+                //System.out.println(prots.get(i).getProtName());
+                if (prots.get(i).getProtName().equals(prot.getProtName())) {
+                    break;
+                }
                 this.protList.add(prot);
+                //System.out.println(this.pepIdent + ": " + prot.getProtName());
             }
         }
     }
+
+    /**
+     *
+     * @return
+     */
     public int getProtNo() {
         return this.protNo;
     }
+
+    /**
+     *
+     * @return
+     */
     public List getProtList() {
         return this.protList;
     }
+
+    /**
+     *
+     */
     public void makeUnique() {
         this.isUnique = true;
     }
+
+    /**
+     *
+     */
     public void makeConflicted() {
         this.isConflicted = true;
     }
+
+    /**
+     *
+     * @return
+     */
     public String getPepName() {
-        return this.pepName;
+        return this.pepIdent;
     }
+
+    /**
+     *
+     * @return
+     */
     public String pepType() {
         String type = "";
         int count = 0;
@@ -108,31 +209,69 @@ public class Peptide {
         }
         return type;
     }
+
+    /**
+     *
+     * @param num
+     * @return
+     */
     public double getQuantVals(int num) {
         return quantVals.get(num);
     }
+
+    /**
+     *
+     */
     public void makeClaimed() {
         this.isClaimed = true;
     }
+
+    /**
+     *
+     */
     public void fromDistinct() {
         this.fromDistinct = true;
     }
+
+    /**
+     *
+     */
     public void makeResolved() {
         this.isResolved = true;
         this.isConflicted = false;
     }
+
+    /**
+     *
+     */
     public void makeSameSet() {
         this.fromSameSet = true;
     }
+
+    /**
+     *
+     */
     public void makeSubSet() {
         this.fromSubSet = true;
     }
+
+    /**
+     *
+     */
     public void makeMutSub() {
         this.fromMutSub = true;
     }
+
+    /**
+     *
+     */
     public void unClaim() {
         this.isClaimed = false;
     }
+
+    /**
+     *
+     */
     public void unDistinct() {
         this.fromDistinct = false;
     }

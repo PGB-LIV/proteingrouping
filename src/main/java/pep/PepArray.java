@@ -14,12 +14,25 @@ public class PepArray {
 
     private ArrayList<Peptide> peptides;
 
+    /**
+     *
+     */
     public PepArray() {
 
         peptides = new <Peptide>ArrayList();
     }
-    public void buildPepArray(List<String> input) {
+
+    /**
+     * Creates array of peptide objects.
+     * Peptides with different charge or rt are kept separate.
+     * Peptides with modifications are added together.
+     * 
+     * @param input
+     */
+    public void buildPepArrayFromProgenesisPepIon(List<String> input, int repNum) {
+        ProtArray proteins = new ProtArray();
         Peptide tempPep = null;
+        Protein tempProt = null;
         String[] pepProperties = null;
         String splitBy = ",";
         String pep = "";
@@ -27,48 +40,81 @@ public class PepArray {
         String charge = ";";
         String featNo = "";
         String seq = "";
+        String rt = "";
+        String mods = "";
 
         for (String line : input) {
             pepProperties = line.split(splitBy);
 
             featNo = pepProperties[0];
+            rt = pepProperties[1]; 
             charge = pepProperties[2];
             seq = pepProperties[8];
-            pep = seq + "_" + charge + "_" + featNo;
+
+            pep = seq + "_" + charge + "_" + rt + "_" + featNo;
             tempPep = checkPep(pep);
 
+            mods = pepProperties[9];
+            tempPep.addMods(mods);
             prot = pepProperties[10];
             tempPep.addProtNames(prot);
 
             List<Double> rawAbund = new ArrayList<>();
-            //System.out.println(rawAbund);
+            Double totAbund = 0.0;
             for (int i = 30; i <= 41; i++) {
                 Double val = Double.parseDouble(pepProperties[i]);
                 rawAbund.add(val);
-            }
+                totAbund = totAbund + val;
+            }            
             tempPep.setQuantVals(rawAbund);
+            Double aveAbun = totAbund / repNum;
+            tempPep.setAveAbund(aveAbun);
         }
     }
-    public void processPeptideMZQ(String pep, String prot) {
-        Peptide tempPep = null;
-        tempPep = checkPep(pep);
-        tempPep.addProtNames(prot);
-    }
-    public void assignMZQquants(String pep, ArrayList<Double> abund) {
-        Peptide tempPep = null;
-        tempPep = checkPep(pep);
-        tempPep.setQuantVals(abund);
-    }
+
+//    /**
+//     *
+//     * @param pep
+//     * @param prot
+//     */
+//    public void processPeptideMZQ(String pep, String prot) {
+//        Peptide tempPep = null;
+//        tempPep = checkPep(pep);
+//        tempPep.addProtNames(prot);
+//    }
+//
+//    /**
+//     *
+//     * @param pep
+//     * @param abund
+//     */
+//    public void assignMZQquants(String pep, ArrayList<Double> abund) {
+//        Peptide tempPep = null;
+//        tempPep = checkPep(pep);
+//        tempPep.setQuantVals(abund);
+//    }
+
+    /**
+     *
+     * @param prots
+     */
     public void assignProtList(ProtArray prots) {
         for (Peptide p : peptides) {
             List<String> protNames = p.getProtNames();
             for (String name : protNames) {
                 Protein protein = prots.retProt(name);
                 p.addProtList(protein);
+                protein.addPepList(p);
+                protein.incPepNo();
+                //System.out.println(p.getPepName() + ": " + protein.getProtName());
             }
             //System.out.println(p.getPepName() + ": " + p.getProtNo());
         }
     }
+
+    /**
+     *
+     */
     public void orderPepsByProtCount() {
         // sort peptides by number of proteins assigned
         // Ascending
@@ -82,6 +128,10 @@ public class PepArray {
                     - protein1.getPepNo());
         }
     }
+
+    /**
+     *
+     */
     public void setUniquePeptides() {
         for (Peptide p : peptides) {
             if (p.getProtNo() == 1) {
@@ -89,6 +139,10 @@ public class PepArray {
             }          
         }
     }
+
+    /**
+     *
+     */
     public void setConflictedPeptides() {
         for (Peptide p : peptides) {
             if (p.isClaimed && !p.isUnique && !p.isResolved) {
@@ -96,9 +150,20 @@ public class PepArray {
             }
         }
     }
+
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return peptides.size();
     }
+
+    /**
+     *
+     * @param index
+     * @return
+     */
     public Peptide getPep(int index) {
         Peptide tempPep = null;
         for (int i = 0; i < peptides.size(); i++) {
@@ -106,6 +171,12 @@ public class PepArray {
         }
         return tempPep;
     }
+
+    /**
+     *
+     * @param pp
+     * @return
+     */
     public Peptide retPep(String pp) {
         Peptide tmpPep = null;
         for (Peptide p : peptides) {

@@ -1,3 +1,6 @@
+/**
+ * Package contains Group object and GroupArray classes.
+ */
 package group;
 
 import pep.Peptide;
@@ -8,13 +11,17 @@ import java.util.List;
  * Creates a Group object.
  */
 public class Group {
-
-    private List<Protein> group;
-    private final Protein groupHead;
     /**
      * Creates a Group object.
-     * 
+     *
      * @param   gh  the Protein object that heads the protein group.
+     */
+    private List<Protein> group;
+    private final Protein groupHead;
+
+    /**
+     *
+     * @param gh
      */
     public Group(Protein gh) {
         this.group = new ArrayList<>();
@@ -23,7 +30,8 @@ public class Group {
         gh.makeHeadProt();
     }
     /**
-     * Add Protein object to the group.
+     * Checks if the protein is already a member of the group and adds
+     * if it is not.
      *
      * @param   prot  the Protein object to be added.
      */
@@ -52,13 +60,13 @@ public class Group {
     /**
      * Gets all Proteins in the Group.
      *
-     * @return   group  the Protein objects in the Group.
+     * @return   group  the list of Protein objects in the Group.
      */
     public List<Protein> getProtGroupList() {
         return this.group;
     }
     /**
-     * Checks if all the Peptides are mapped to the Group head protein.
+     * Checks if all the Peptides in a list are mapped to the Group head protein.
      *
      * @param   peps    List of Peptides to compare.
      * @return  bool    boolean value.

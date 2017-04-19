@@ -9,8 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import utils.Save;
 
+/**
+ *
+ * @author hayle
+ */
 public class ProteinInference {
 
+    /**
+     *
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
         List<String> inputData = new ArrayList<String>();
@@ -24,8 +33,9 @@ public class ProteinInference {
         //String inputFormat = "mzq";
 
         // Set the protein quantification method
-        //String quantMethod = "hi3";
-        String quantMethod = "sum";
+        String quantMethod = "hi3";
+        //String quantMethod = "sum";
+        //String quantMethod = "ProgeneisHi3NonConflicting";
 
         int repNum = 12;
         String inputPath = "inputFiles\\";
@@ -35,17 +45,19 @@ public class ProteinInference {
         //String fileName = "PXD001819_P_PeptideIon_All_NG_20.09.16.csv";
         //String fileName = "PXD002099_P_PeptideIon_All_NG_21.09.16.csv";
         String fileName = "ExampleDataProgenesis.csv";
+
         //String fileName = "ExampleData.mzq";
         //String fileName = "testInput.mzq";
         //String fileName = "AllAgesRawPeptidesOnly.mzq";
         
         inputData = ReadIn.readInCSV(inputPath + fileName);
-        peptides.buildPepArray(inputData);
-        proteins.buildProtArray(inputData);
+
+        peptides.buildPepArrayFromProgenesisPepIon(inputData, repNum);
+        proteins.buildProtArrayFromProgenesisPepIon(inputData);
 
         // Maps the proteins and peptides to each other
         peptides.assignProtList(proteins);
-        proteins.assignPepList(peptides);
+        //proteins.assignPepList(peptides);
 
         // Discards proteins mapped by 0 or 1 peptide
         proteins.discardNonIdent();

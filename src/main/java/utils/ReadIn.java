@@ -2,7 +2,9 @@ package utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,9 @@ import java.util.List;
  */
 public class ReadIn {
 
+    /**
+     *
+     */
     public ReadIn() {
         
     }
@@ -26,8 +31,6 @@ public class ReadIn {
         int count = 1;
         String tempLine = "";
         List<String> data = new ArrayList<String>();
-        String[] pepProperties = null;
-
         try {
             BufferedReader inputFile =
                     new BufferedReader(new FileReader(fileName));
@@ -44,5 +47,5 @@ public class ReadIn {
             System.out.println("Unable to read " + fileName);
         }
     return data;
-    }
+    } 
 }
