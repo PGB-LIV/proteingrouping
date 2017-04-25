@@ -29,7 +29,7 @@ public class PepArray {
      * 
      * @param input
      */
-    public void buildPepArrayFromProgenesisPepIon(List<String> input, int repNum) {
+    public void buildPepArrayFromProgenesisPepIon(List<String> input, int repNum, int featureType) {
         ProtArray proteins = new ProtArray();
         Peptide tempPep = null;
         Protein tempProt = null;
@@ -50,13 +50,20 @@ public class PepArray {
             rt = pepProperties[1]; 
             charge = pepProperties[2];
             seq = pepProperties[8];
-
-            pep = seq + "_" + charge + "_" + rt + "_" + featNo;
+            mods = pepProperties[9];
+            
+            if (featureType == 1) {
+                pep = seq + "_" + mods;
+            }
+            else {
+                pep = seq + "_" + charge + "_" + rt + "_" + featNo;
+                
+            }
             tempPep = checkPep(pep);
 
-            mods = pepProperties[9];
             tempPep.addMods(mods);
             prot = pepProperties[10];
+
             tempPep.addProtNames(prot);
 
             List<Double> rawAbund = new ArrayList<>();
@@ -72,28 +79,6 @@ public class PepArray {
         }
     }
 
-//    /**
-//     *
-//     * @param pep
-//     * @param prot
-//     */
-//    public void processPeptideMZQ(String pep, String prot) {
-//        Peptide tempPep = null;
-//        tempPep = checkPep(pep);
-//        tempPep.addProtNames(prot);
-//    }
-//
-//    /**
-//     *
-//     * @param pep
-//     * @param abund
-//     */
-//    public void assignMZQquants(String pep, ArrayList<Double> abund) {
-//        Peptide tempPep = null;
-//        tempPep = checkPep(pep);
-//        tempPep.setQuantVals(abund);
-//    }
-
     /**
      *
      * @param prots
@@ -105,10 +90,18 @@ public class PepArray {
                 Protein protein = prots.retProt(name);
                 p.addProtList(protein);
                 protein.addPepList(p);
+                protein.addNCPepList(p);
                 protein.incPepNo();
                 //System.out.println(p.getPepName() + ": " + protein.getProtName());
             }
             //System.out.println(p.getPepName() + ": " + p.getProtNo());
+        }
+    }
+    public void setAbundShare(int num) {
+        for (Peptide p : peptides) {
+            if (p.isConflicted) {
+                p.setAbundShare(num);
+            }
         }
     }
 

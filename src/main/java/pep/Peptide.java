@@ -14,11 +14,12 @@ public class Peptide {
     private int charge, rt, featNo;
     private List<String> protNames, mods;
     private List<Protein> protList;
-    private List<Double> quantVals;
+    private List<Double> quantVals, quantShare;
     private Double aveAbund;
     public boolean isUnique, isResolved, isConflicted, isClaimed, fromSameSet, 
             fromDistinct, fromSubSet, fromMutSub;
     private int protNo, modNo;
+    private List<List<Double>> runAbundShares; 
 
     /**
      * Creates a Peptide object.
@@ -33,6 +34,9 @@ public class Peptide {
         this.protNames = new ArrayList<>();
         this.quantVals = new ArrayList<>();
         this.mods = new ArrayList<>();
+        // loops in order with protList
+        this.quantShare = new ArrayList<>();
+        this.runAbundShares = new ArrayList<>();
 
         this.protNo = 0;
         this.modNo = 0;
@@ -94,6 +98,7 @@ public class Peptide {
         if (valNum == 0) {
             this.quantVals = vals;
         }
+        // If feature already exists, quant value added
         else {
             List<Double> newQuants = new ArrayList<>();
             for (int i = 0; i < valNum; i++) {
@@ -145,6 +150,46 @@ public class Peptide {
                 //System.out.println(this.pepIdent + ": " + prot.getProtName());
             }
         }
+    }
+    public void setAbundShare(int num) {
+        for (int run = 0; run < num; run++) {
+            List<Double> abundShare = new ArrayList<>();
+            List<Double> protQuants = new ArrayList<>();
+            for (Protein prot : this.protList) {
+                protQuants.add(prot.getHiNnonConquants(run));
+                //System.out.println(prot.getProtName());
+            }
+            Double quotient = 0.0;
+            for (Double pq : protQuants) {
+                quotient = quotient + pq;
+                //System.out.println(quotient);
+            }
+            quotient = this.quantVals.get(run) / quotient;
+            //System.out.println(quotient);
+            for (Protein prot : this.protList) {
+                Double protShare = prot.getHiNnonConquants(run) * quotient;
+                abundShare.add(protShare);
+                //System.out.print(prot.getProtName());
+                //System.out.println(protShare);
+            }
+            this.runAbundShares.add(abundShare);
+        }
+    }
+    public Double getAbundShare(String protName, int runNo, int num) {
+        Double share = 0.0;
+        for (int run = 0; run < num; run++) {
+            List<Double> protShare = this.runAbundShares.get(runNo);
+
+            int index = 0;
+            for (Protein prot : this.protList) {
+                if (protName.equals(prot.getProtName())) {
+                    //System.out.println(prot.getProtName());
+                    index = this.protList.indexOf(prot);
+                }                
+            }
+            share = protShare.get(index);
+        }
+        return share;
     }
 
     /**

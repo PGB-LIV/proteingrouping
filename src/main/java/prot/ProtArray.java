@@ -32,62 +32,14 @@ public class ProtArray {
         Protein tempProt = null;
         String[] pepProperties = null;
         String splitBy = ",";
-        String pep = "";
         String prot = "";
-        String charge = ";";
-        String featNo = "";
-        String seq = "";
-        String rt = "";
         
         for (String line : input) {
             pepProperties = line.split(splitBy);
-
-//            featNo = pepProperties[0];
-//            rt = pepProperties[1];
-//            charge = pepProperties[2];
-//            seq = pepProperties[8];
-//            pep = seq + "_" + charge + "_" + rt + "_" + featNo;
-
             prot = pepProperties[10];
             tempProt = checkProt(prot);
-
-            //tempProt.addPepNames(pep);
         }
     }
-    // Method to build array from .mzq file
-
-    /**
-     *
-     * @param prot
-     * @param peps
-     */
-//    public void processProteinTagMZQ(String prot, String[] peps) {
-//        Protein tempProt = null;
-//        tempProt = checkProt(prot);
-//        for (String pep : peps) {
-//            tempProt.addPepNames(pep.replace(" ", ""));                    
-//        }
-//    }
-    // Maps peptide objects to protein objects in array
-
-    /**
-     *
-     * @param peps
-     */
-//    public void assignPepList(PepArray peps) {
-//        for (Protein p : proteins) {
-//            //System.out.println(p.getProtName() + ": ");
-//            List<String> pepNames = p.getPepNames();
-//            //System.out.println(pepNames);
-//            for (String name : pepNames) {
-//                Peptide peptide = peps.retPep(name);
-//                //System.out.println(peptide.getPepName());
-//                p.addPepList(peptide);
-//            }
-//        }
-//    }
-    // Removes proteins 
-
     /**
      *
      */
@@ -101,7 +53,6 @@ public class ProtArray {
             }
         }
     }
-
     /**
      *
      */
@@ -258,27 +209,21 @@ public class ProtArray {
      * @param method
      * @param num
      */
-    public void setQuants(String method, int num) {        
+    public void setQuants(int num) {        
         for (Protein p: proteins) {
-            if (p.isHeadProt && !p.isDiscarded) {
-                if ("hi3".equals(method)) {
-                    p.setQuantHi3(num);
-                }
-                if ("sum".equals(method)) {
-                    p.setQuantSum(num);
-                }
-                if ("ProgeneisHi3NonConflicting".equals(method)) {
-                    p.setQuantProHi3NC(num);                    
-                }
-            }
-        }
-        if ("ProgeneisHi3NonConflicting".equals(method)) {
-            for (Protein p: proteins) {
-                p.assignResolvedPepQuants();
+            if (p.isHeadProt && !p.isDiscarded) {                
+                p.setQuantSum(num);
+                p.setQuantHiN(num);
+                p.setQuantHi3NonConSameAccrossRuns(num);                    
             }
         }
     }
-
+    public void setQuantProgenesisHi3NonConflicting(int num) {
+        for (Protein p: proteins) {
+            //System.out.println(p.getProtName());
+            p.setQuantProgenesisHi3NonConflicting(num);
+        }
+    }
     /**
      *
      * @param prn

@@ -33,26 +33,31 @@ public class ProteinInference {
         //String inputFormat = "mzq";
 
         // Set the protein quantification method
-        String quantMethod = "hi3";
+        //String quantMethod = "HiN";
         //String quantMethod = "sum";
-        //String quantMethod = "ProgeneisHi3NonConflicting";
+        String quantMethod = "ProgeneisHi3NonConflicting";
 
-        int repNum = 12;
+        int repNum = 12;    // the number of runs 
         String inputPath = "inputFiles\\";
         String outputPath = "outputFiles\\";
 
         //String fileName = "inputFiles\ProgenesisFormat.csv";
-        //String fileName = "PXD001819_P_PeptideIon_All_NG_20.09.16.csv";
+        String fileName = "PXD001819_P_PeptideIon_All_NG_20.09.16.csv";
         //String fileName = "PXD002099_P_PeptideIon_All_NG_21.09.16.csv";
-        String fileName = "ExampleDataProgenesis.csv";
+        //String fileName = "ExampleDataProgenesis.csv";
 
         //String fileName = "ExampleData.mzq";
         //String fileName = "testInput.mzq";
         //String fileName = "AllAgesRawPeptidesOnly.mzq";
         
         inputData = ReadIn.readInCSV(inputPath + fileName);
-
-        peptides.buildPepArrayFromProgenesisPepIon(inputData, repNum);
+        
+        if (quantMethod.equals("ProgeneisHi3NonConflicting")) {
+            peptides.buildPepArrayFromProgenesisPepIon(inputData, repNum, 1);
+        }
+        else {
+            peptides.buildPepArrayFromProgenesisPepIon(inputData, repNum, 2);
+        }
         proteins.buildProtArrayFromProgenesisPepIon(inputData);
 
         // Maps the proteins and peptides to each other
@@ -78,12 +83,15 @@ public class ProteinInference {
         peptides.setConflictedPeptides();
 
         // Quantifies proteins
-        proteins.setQuants(quantMethod, repNum);
+        proteins.setQuants(repNum);
+        peptides.setAbundShare(repNum);
+        proteins.setQuantProgenesisHi3NonConflicting(repNum);
+        
 
         //Saves outputs as csv files
         Save saveAs = new Save();
         saveAs.savePeps(outputPath + "peps_" + fileName, repNum, peptides);
         saveAs.saveProts(outputPath + "prots_" + fileName, proteins);
-        saveAs.saveGroups(outputPath + "PG_" + fileName, repNum, protGroups);
+        saveAs.saveGroups(outputPath + "PG_" + fileName, repNum, protGroups, quantMethod);
     }
 }

@@ -112,7 +112,8 @@ public class Save {
      * @param fname     * @param num
      * @param groups
      */
-    public void saveGroups(String fname, int num, GroupArray groups) {
+    
+    public void saveGroups(String fname, int num, GroupArray groups, String quantMethod) {
         try {
             PrintWriter outFile = new PrintWriter(new FileWriter(fname), false);
             //outFile.println("Cond1 ,Cond2 ,Cond3 ,Cond4 ,Head");
@@ -120,21 +121,32 @@ public class Save {
                 Group g = groups.getGroup(i);
                 Protein gh = g.getGroupHead();
                 if (!gh.isDiscarded) {
-                    //System.out.print(gh.getProtName() + ": ");
-                    for (int j = 0; j < num; j++) {
-                        outFile.print(gh.getQuant(j) + ",");
-                        //System.out.print(gh.getQuant(i) + " ");
-                    }
-                    //System.out.println();
-                    String groupHeadName = g.getGroupHead().getProtName();
-                    outFile.print(groupHeadName + ",");
+                    String groupHeadName = gh.getProtName();
+                    outFile.print(groupHeadName);
                     List<Protein> prots = g.getProtGroupList();
                     for (Protein pr : prots) {
                         String protName = pr.getProtName();
                         if (!protName.equals(groupHeadName)) {
-                            outFile.print(protName + ",");
+                            outFile.print(";" + protName);
+                        }                        
+                    }
+                    outFile.print(",");
+                    List<Peptide> pepList = gh.getPepList();
+                    outFile.print(pepList.size() + ",");
+                    int unPeps = 0;
+                    for (Peptide pep : pepList) {
+                        if (pep.isUnique) {
+                            unPeps++;
                         }
                     }
+                    outFile.print(unPeps + ",");
+                    //System.out.print(gh.getProtName() + ": ");
+                    for (int run = 0; run < num; run++) {
+                        outFile.print(gh.getQuant(run, quantMethod) + ",");
+                        //System.out.print(gh.getQuant(run, quantMethod) + " ");
+                    }
+                    //System.out.println();
+
                     outFile.println();
                 }
             }

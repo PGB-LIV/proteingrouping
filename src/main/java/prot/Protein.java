@@ -13,14 +13,15 @@ import java.util.List;
 public class Protein {
 
     private String protName;
-    //private List<String> pepNames;
-    private List<Peptide> pepList;
-    private List<Double> quants;
+    private List<Peptide> pepList, NCpepList;
+    private List<Double> allPepsQuants, hiNquantsNC, HiNnonConquants, 
+            progenesisHiNquantsNC;
     public boolean isDistinct, isSameSet, isSubset, isMutSub, isAssigned, 
             isHeadProt, isDiscarded, isGroupMember;
     private int pepNo;
     private String protType;
     private List<Peptide> resolvedList;
+    private Double aveHiNnonConquants;
     /**
     * Creates a Protein object.
     *
@@ -30,11 +31,15 @@ public class Protein {
 
         this.protName = prot;
         this.pepList = new ArrayList<>();
-        //this.pepNames = new ArrayList<>();
-        this.quants = new ArrayList<>();
-        this.resolvedList = new ArrayList<>();
+        this.NCpepList = new ArrayList<>();
+        
+        this.allPepsQuants = new ArrayList<>();
+        this.hiNquantsNC = new ArrayList<>();
+        this.HiNnonConquants = new ArrayList<>();
+        this.progenesisHiNquantsNC = new ArrayList<>();
 
-        pepNo = 0;
+        this.pepNo = 0;
+        this.aveHiNnonConquants = 0.0;
 
         isDistinct = false;
         isSameSet = false;
@@ -46,35 +51,6 @@ public class Protein {
         protType = "";
     }
 
-    /**
-     *
-     * @param pep
-     * @return
-     */
-//    public boolean pepInList(String pep) {
-//        boolean bool = false;
-//        List <String> pepN = this.pepNames;
-//        for (String p : pepN) {
-//            if (p.trim().contains(pep)) {
-//                bool = true;
-//            }
-//        }
-//        return bool;
-//    }
-
-    /**
-     *
-     * @param pep
-     */
-//    public void addPepNames(String pep) {
-//        this.pepNames.add(pep);
-//        this.pepNo++;
-//    }
-
-    /**
-     *
-     * @return
-     */
     public String getProtName() {
         return this.protName;
     }
@@ -82,132 +58,90 @@ public class Protein {
         this.pepNo++;
     }
 
-    /**
-     *
-     * @param pep
-     */
     public void addPepList(Peptide pep) {
         this.pepList.add(pep);        
-//        int peNo = this.pepList.size();
-//        if (peNo == 0) {
-//            this.pepList.add(pep);
-//        }
-//        else {
-//            List <Peptide> peps = this.pepList;
-//            for (int i = 0; i < peps.size(); i++) {
-//                //System.out.println(peps.get(i).getPepName());
-//                if (peps.get(i).getPepName().equals(pep.getPepName())) {
-//                    break;
-//                }
-//                this.pepList.add(pep);
-//                //System.out.println(this.protName + ": " + pep.getPepName());
-//            }
-//        }
     }
-
-    /**
-     *
-     * @return
-     */
+    public void addNCPepList(Peptide pep) {
+        this.NCpepList.add(pep);        
+    }    
     public int getPepNo() {
         return this.pepNo;
     }
-
-    /**
-     *
-     * @return
-     */
     public List getPepList() {
         return this.pepList;
     }
-
-    /**
-     *
-     */
     public void makeDistinct() {
         this.isDistinct = true;
         this.isAssigned = true;
         this.protType = "Distinct";
     }
-
-    /**
-     *
-     */
     public void makeSameSet() {
         this.isSameSet = true;
         this.isAssigned = true;
         this.protType = "SameSet";
     }
-
-    /**
-     *
-     */
     public void makeSubSet() {
         this.isSubset = true;
         this.isAssigned = true;
         this.protType = "SubSet";
     }
-
-    /**
-     *
-     */
     public void makeMutSub() {
         this.isMutSub = true;
         this.isAssigned = true;
         this.protType = "MutSub";
     }
-
-    /**
-     *
-     */
     public void makeDiscarded() {
         this.isDiscarded = true;
     }
-
     /**
-     *
-     * @param num
+     * Set quant values using all peptides
+     * @param num   Number of runs per condition
      */
     public void setQuantSum(int num) {
+        //System.out.println(this.protName + ": ");
         List<Peptide> peps = this.pepList;
         // for each of the runs, i
-        for (int i = 0; i < num; i++) {
+        for (int run = 0; run < num; run++) {
             Double tempVal = 0.0;
             // peptide quant value for run i for each peptide in list
             // is added to protien quant value i
             for (Peptide pep : peps) {
+                //System.out.print(pep.getPepName() + " - ");
+                // Uncomment for only non-conflicted peptides
                 if (!pep.isConflicted) {
-                    tempVal = tempVal + pep.getQuantVals(i);
+                    tempVal = tempVal + pep.getQuantVals(run);
+                    //System.out.print(tempVal + ", ");
                 }
             }
-            this.quants.add(i, tempVal);
-            //System.out.println("Prot: " + this.protName + " - " + i
-            //        + " - " + this.quants.get(i));
-        }
+            this.allPepsQuants.add(run, tempVal);
+            //System.out.print(tempVal);
+            //System.out.println();
+        }        
     }
 
     /**
-     * NB - this may have different top 3 for each run
-     * @param num
+     * Sets protein quant values from top 3 most abundant unique/resolved peptides
+     * NB maybe different top 3 peptides for each run
+     * 
+     * @param num   Number of runs per condition
      */
-
-    public void setQuantHi3(int num) {
+    public void setQuantHiN(int num) {
         
-        List<Peptide> pepL = this.pepList;
-
+        //this.NCpepList = this.pepList;
+        List<Peptide> pepL = this.NCpepList;
+                
+        // Removes any conflicted peptides from list to be used for quantification
+        List<Peptide> uniquePeps = removeConflictedPeps(pepL);
+        
         for (int i = 0; i < num; i++) {
             List<Double> runPepQuants = new ArrayList<>();
-
-            for (Peptide pep : pepL) {
-                
-                if (pep.isConflicted) {
-                    break;
-                }
+            for (Peptide pep : uniquePeps) {
                 //System.out.println(this.protName + " - " + pep.getPepName());
                 runPepQuants.add(pep.getQuantVals(i));
             }
             Collections.sort(runPepQuants, Collections.reverseOrder());
             //System.out.println("Run: " + i + " - " + runPepQuants);
+
             Double tempVal = 0.0;
             int hiN = 3;
             int vals = runPepQuants.size();
@@ -219,34 +153,47 @@ public class Protein {
                 tempVal = tempVal + runPepQuants.get(j);                
             }
             
-            this.quants.add(i, tempVal);
+            this.hiNquantsNC.add(i, tempVal);
             //System.out.println("Prot: " + this.protName
-            //        + " - " + this.quants.get(i));
+            //        + " - " + this.hiNquantsNC.get(i));
         }
     }
     /**
-     * Choose the same top 3 for each run
-     * @param num
+     * Sets protein quant values from top 3 most abundant unique/resolved peptides
+     * NB uses same peptides for all runs after ordering the list by the peptide's
+     * average abundance across all runs
+     * 
+     * @param num   Number of runs per condition
      */
-    public void setQuantProHi3NC(int num) {
-
-        List<Peptide> pepL = this.pepList;
-        Iterator<Peptide> iter = pepL.iterator();
+    public void setQuantHi3NonConSameAccrossRuns(int num) {
+        // Removes any conflicted peptides from list to be used for quantification
+        List<Peptide> uniquePeps = this.NCpepList;
+        // Orders the peptide list by their average abundance across all runs
+        orderPepList(uniquePeps);
+        this.HiNnonConquants = getHiNQuants(uniquePeps, num);
+        //setAveHiNnonConquants(this.HiNnonConquants);
+    }
+    private List<Peptide> removeConflictedPeps(List<Peptide> pepList) {
+        Iterator<Peptide> iter = pepList.iterator();
         while (iter.hasNext()) {
             Peptide pep = iter.next();
             if (pep.isConflicted) {
                 iter.remove();
             }
         }
-
-        Collections.sort(pepL,
+        return pepList;
+    }
+    private List<Peptide> orderPepList(List<Peptide> pepList) {
+        Collections.sort(pepList,
             (pepetide1, pepetide2) -> pepetide2
                     .getAveAbund().compareTo(pepetide1.getAveAbund()));
-
-        for (int i = 0; i < num; i++) {
-
+        return pepList;
+    }
+    private List<Double> getHiNQuants(List<Peptide> pepList, int num) {
+        List<Double> ncQuants = new ArrayList<>();
+        for (int run = 0; run < num; run++) {
             int hiN = 3;
-            int pepLNo = pepL.size();
+            int pepLNo = pepList.size();
             int loop = hiN;
 
             if (pepLNo < hiN) {
@@ -254,59 +201,78 @@ public class Protein {
             }
             Double tempVal = 0.0;
             for (int j = 0; j < loop; j++) {         
-                if (pepL.get(j).isResolved) {
-                    // Need to share this quant in ratio of rel quant of proteins its mapped to
-                    this.resolvedList.add(pepL.get(j));
-                }
-                //System.out.println(this.protName + " - " + pep.getPepName());
-                tempVal = tempVal + pepL.get(j).getQuantVals(i);
+                tempVal = tempVal + pepList.get(j).getQuantVals(run);
             }
-
-            this.quants.add(i, tempVal);
-            //System.out.println("Prot: " + this.protName
-            //        + " - " + this.quants.get(i));
+            ncQuants.add(run, tempVal);
         }
+        return ncQuants;
     }
-    
-    public void assignResolvedPepQuants() {
+//    private void setAveHiNnonConquants(List<Double> quants) {
+//        Double tempVal = 0.0;
+//        for (Double quant : quants) {
+//            tempVal = tempVal + quant;
+//        }
+//        this.aveHiNnonConquants = tempVal / quants.size();
+//    }
+    public Double getHiNnonConquants(int run) {
+        Double val = 0.0;
+        for (Double quant : this.HiNnonConquants) {
+            val = this.HiNnonConquants.get(run);
+        }
+        return val;
+    }
+    public void setQuantProgenesisHi3NonConflicting(int num) {
+        List<Peptide> pepL = orderPepList(this.pepList);
+        
+        for (int run = 0; run < num; run++) {
+            int hiN = 3;
+            int pepLNo = pepList.size();
+            int loop = hiN;
+
+            if (pepLNo < hiN) {
+                loop = pepLNo;
+            }
+            Double tempVal = 0.0;
+            for (int j = 0; j < loop; j++) {
+                Peptide pep = pepList.get(j);
+                //System.out.print(pep.getPepName());
+                if (!pep.isConflicted) {
+                    tempVal = tempVal + pep.getQuantVals(run);
+//                    System.out.println(" - not conflicted");
+//                    System.out.println(tempVal);
+                }
+                else {                    
+                    Double val = pep.getAbundShare(this.protName, run, num);
+                    tempVal = tempVal + val;
+//                    System.out.println(" - else");
+//                    System.out.println(val);
+//                    System.out.println(tempVal);
+                }
+            }
+            tempVal = tempVal / hiN;
+            this.progenesisHiNquantsNC.add(run, tempVal);
+        }
         
     }
-
-    /**
-     *
-     * @return
-     */
     public String protType() {
         return this.protType;
     }
-
-    /**
-     *
-     */
     public void makeHeadProt() {
         this.isHeadProt = true;
     }
-
-    /**
-     *
-     * @param num
-     * @return
-     */
-    public double getQuant(int num) {
-        return this.quants.get(num);
+    public double getQuant(int run, String quantMethod) {
+        Double quant = 0.0;
+        if (quantMethod.equals("HiN")) {
+            quant = this.hiNquantsNC.get(run);
+        }
+        if (quantMethod.equals("sum")) {
+            quant = this.allPepsQuants.get(run);
+        }
+        if (quantMethod.equals("ProgeneisHi3NonConflicting")) {
+            quant = this.progenesisHiNquantsNC.get(run);
+        }
+        return quant;
     }
-
-    /**
-     *
-     * @return
-     */
-//    public List getPepNames() {
-//        return this.pepNames;
-//    }
-
-    /**
-     *
-     */
     public void makeGroupMember() {
         this.isGroupMember = true;
     }
