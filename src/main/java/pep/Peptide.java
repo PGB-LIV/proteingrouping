@@ -26,9 +26,8 @@ public class Peptide {
      *
      * @param pepName
      */
-
     public Peptide(String pep) {
-
+        
         this.pepIdent = pep;
         this.protList = new ArrayList<>();
         this.protNames = new ArrayList<>();
@@ -41,6 +40,7 @@ public class Peptide {
         this.protNo = 0;
         this.modNo = 0;
         this.aveAbund = 0.0;
+        this.featNo = 0;
 
         isUnique = false;
         isResolved = false;
@@ -68,6 +68,24 @@ public class Peptide {
             this.modNo++;
         }
     }
+    public void setSeq(String s) {
+        this.seq = s;
+    }
+    public String getSeq() {
+        return this.seq;
+    }    
+    public void setFeatNo(int feat) {
+        this.featNo = feat;
+    }
+    public int getFeatNo() {
+        return this.featNo;
+    }
+    public void setCharge(int ch) {
+        this.charge = ch;
+    }
+    public int getCharge() {
+        return this.charge;
+    }
     /**
      * Adds Protein to the list.
      *
@@ -89,10 +107,6 @@ public class Peptide {
         }
     }
 
-    /**
-     *
-     * @param vals
-     */
     public void setQuantVals(List<Double> vals) {
         int valNum = this.quantVals.size();
         if (valNum == 0) {
@@ -121,35 +135,16 @@ public class Peptide {
         return this.aveAbund;
     }
 
-    /**
-     *
-     * @return
-     */
     public List getProtNames() {
         return this.protNames;
     }
     // Gets the list of protein objects from the String name
-
-    /**
-     *
-     * @param prot
-     */
     public void addProtList(Protein prot) {
-        int proNo = this.protList.size();
-        if (proNo == 0) {
+        if (!this.protList.contains(prot)) {
             this.protList.add(prot);
+            //System.out.println("added: " + prot.getProtName());
         }
-        else {
-            List <Protein> prots = this.protList;
-            for (int i = 0; i < prots.size(); i++) {
-                //System.out.println(prots.get(i).getProtName());
-                if (prots.get(i).getProtName().equals(prot.getProtName())) {
-                    break;
-                }
-                this.protList.add(prot);
-                //System.out.println(this.pepIdent + ": " + prot.getProtName());
-            }
-        }
+
     }
     public void setAbundShare(int num) {
         for (int run = 0; run < num; run++) {
@@ -192,48 +187,26 @@ public class Peptide {
         return share;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getProtNo() {
         return this.protNo;
     }
 
-    /**
-     *
-     * @return
-     */
     public List getProtList() {
         return this.protList;
     }
 
-    /**
-     *
-     */
     public void makeUnique() {
         this.isUnique = true;
     }
 
-    /**
-     *
-     */
     public void makeConflicted() {
         this.isConflicted = true;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getPepName() {
         return this.pepIdent;
     }
 
-    /**
-     *
-     * @return
-     */
     public String pepType() {
         String type = "";
         int count = 0;
@@ -255,68 +228,39 @@ public class Peptide {
         return type;
     }
 
-    /**
-     *
-     * @param num
-     * @return
-     */
-    public double getQuantVals(int num) {
-        return quantVals.get(num);
+    public double getQuantVals(int run) {
+        return quantVals.get(run);
     }
 
-    /**
-     *
-     */
     public void makeClaimed() {
         this.isClaimed = true;
     }
 
-    /**
-     *
-     */
     public void fromDistinct() {
         this.fromDistinct = true;
     }
 
-    /**
-     *
-     */
     public void makeResolved() {
         this.isResolved = true;
         this.isConflicted = false;
     }
 
-    /**
-     *
-     */
     public void makeSameSet() {
         this.fromSameSet = true;
     }
 
-    /**
-     *
-     */
     public void makeSubSet() {
         this.fromSubSet = true;
     }
 
-    /**
-     *
-     */
     public void makeMutSub() {
         this.fromMutSub = true;
     }
 
-    /**
-     *
-     */
     public void unClaim() {
         this.isClaimed = false;
     }
 
-    /**
-     *
-     */
     public void unDistinct() {
         this.fromDistinct = false;
     }

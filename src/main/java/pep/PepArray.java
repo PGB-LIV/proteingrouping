@@ -24,20 +24,17 @@ public class PepArray {
 
     /**
      * Creates array of peptide objects.
-     * Peptides with different charge or rt are kept separate.
-     * Peptides with modifications are added together.
      * 
      * @param input
      */
-    public void buildPepArrayFromProgenesisPepIon(List<String> input, int repNum, int featureType) {
-        ProtArray proteins = new ProtArray();
+    public void buildPepArrayFromProgenesisPepIon(List<String> input, int repNum, String featureType) {
+
         Peptide tempPep = null;
-        Protein tempProt = null;
         String[] pepProperties = null;
         String splitBy = ",";
         String pep = "";
         String prot = "";
-        String charge = ";";
+        String charge = "";
         String featNo = "";
         String seq = "";
         String rt = "";
@@ -51,19 +48,26 @@ public class PepArray {
             charge = pepProperties[2];
             seq = pepProperties[8];
             mods = pepProperties[9];
-            
-            if (featureType == 1) {
+
+            if (featureType.equals("sumCharge")) {
                 pep = seq + "_" + mods;
             }
-            else {
-                pep = seq + "_" + charge + "_" + rt + "_" + featNo;
-                
+            if (featureType.equals("sumMods")) {
+                pep = seq + " " + charge;                
+            }
+            if (featureType.equals("sumBoth")) {
+                pep = seq + "_";
+            }
+            if (featureType.equals("seperate")) {
+                pep = seq + "_" + charge + "_" + rt + "_" + mods;
             }
             tempPep = checkPep(pep);
-
+            tempPep.setSeq(seq);
             tempPep.addMods(mods);
+            //NB if peptide ions have been added, last occurance will be used
+            tempPep.setFeatNo(Integer.parseInt(featNo));
+            tempPep.setCharge(Integer.parseInt(charge));
             prot = pepProperties[10];
-
             tempPep.addProtNames(prot);
 
             List<Double> rawAbund = new ArrayList<>();
@@ -86,16 +90,30 @@ public class PepArray {
     public void assignProtList(ProtArray prots) {
         for (Peptide p : peptides) {
             List<String> protNames = p.getProtNames();
+            //System.out.println("Pep: " + p.getPepName());
+//            System.out.print("ProtNames: ");
+            //System.out.println(protNames);
+            int count = 10;
             for (String name : protNames) {
+                //System.out.print(prots.retProt(name).getProtName()+ ", ");
                 Protein protein = prots.retProt(name);
+                //System.out.println(count + " " + protein.getProtName());
+                count ++;
                 p.addProtList(protein);
                 protein.addPepList(p);
                 protein.addNCPepList(p);
                 protein.incPepNo();
-                //System.out.println(p.getPepName() + ": " + protein.getProtName());
+                //System.out.print(protein.getProtName() + ", ");
             }
-            //System.out.println(p.getPepName() + ": " + p.getProtNo());
+            //System.out.println();
+            //System.out.println("Prot no: " + p.getProtNo());
         }
+//        for (Peptide p : peptides) {
+//            List<Protein> protsL = p.getProtList();
+//            if (p.getProtNo() > 2) {
+//                System.out.println(p.getPepName() + ": " + protsL.size() + " - " + p.getProtNo());
+//            }
+//        }
     }
     public void setAbundShare(int num) {
         for (Peptide p : peptides) {
@@ -111,15 +129,29 @@ public class PepArray {
     public void orderPepsByProtCount() {
         // sort peptides by number of proteins assigned
         // Ascending
+//        for (Peptide p : peptides) {
+//            List<Protein> prots = p.getProtList();
+//            if (p.getProtNo() > 2) {
+//                System.out.println(p.getPepName() + ": " + prots.size() + " - " + p.getProtNo());
+//            }
+//        }
         Collections.sort(peptides,
                 (peptide1, peptide2) -> peptide1.getProtNo()
                     - peptide2.getProtNo());
+//        for (Peptide p : peptides) {
+//            List<Protein> prots = p.getProtList();
+//            System.out.println(p.getPepName() + ": " + prots.size() + " - " + p.getProtNo());
+//        }
         for (Peptide pep : peptides) {
             List <Protein> prots = pep.getProtList();
             Collections.sort(prots,
                 (protein1, protein2) -> protein2.getPepNo()
                     - protein1.getPepNo());
         }
+//        for (Peptide p : peptides) {
+//            List<Protein> prots = p.getProtList();
+//            System.out.println(p.getPepName() + ": " + prots.size() + " - " + p.getProtNo());
+//        }
     }
 
     /**
